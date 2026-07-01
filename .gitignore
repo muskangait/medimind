@@ -1,0 +1,17 @@
+# Frontend
+frontend/node_modules
+frontend/.env
+frontend/dist
+
+# Backend
+backend/target
+backend/.env
+
+# ML Service
+ml-service/__pycache__
+ml-service/*.pyc
+ml-service/.env
+
+# System
+.DS_Store
+Thumbs.db
