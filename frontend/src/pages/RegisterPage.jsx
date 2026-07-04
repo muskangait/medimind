@@ -55,26 +55,24 @@ const RegisterPage = () => {
       <div className="hidden lg:flex flex-1 bg-blue-600 items-center justify-center p-12">
         <div className="text-center text-white">
           <div className="w-20 h-20 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Heart size={40} className="text-white" />
-          </div>
+  <span className="text-5xl">🏥</span>
+</div>
           <h2 className="text-3xl font-bold mb-4">Join MediMind Today</h2>
           <p className="text-blue-200 text-lg max-w-sm">
             Take control of your health with AI-powered insights and personalized care.
           </p>
           <div className="mt-8 space-y-3 text-left">
-            {[
-              'AI Symptom Analysis',
-              'Disease Risk Prediction',
-              'Doctor Appointment Booking',
-              'Medication Reminders',
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-3">
-                <div className="w-5 h-5 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="text-blue-100 text-sm">{item}</span>
-              </div>
-            ))}
+           {[
+  { icon: '🔬', label: 'AI Symptom Analysis' },
+  { icon: '📊', label: 'Disease Risk Prediction' },
+  { icon: '👨‍⚕️', label: 'Doctor Appointment Booking' },
+  { icon: '💊', label: 'Medication Reminders' },
+].map((item) => (
+  <div key={item.label} className="flex items-center gap-3">
+    <span className="text-xl">{item.icon}</span>
+    <span className="text-blue-100 text-sm">{item.label}</span>
+  </div>
+))}
           </div>
         </div>
       </div>
