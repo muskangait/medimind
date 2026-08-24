@@ -5,17 +5,29 @@ import os
 
 app = Flask(__name__)
 
-# Allow requests from React frontend and Spring Boot
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "http://localhost:5173",
-            "http://localhost:8081",
-            "http://localhost:8082",
-            "https://medimind.vercel.app"
-        ]
-    }
-})
+
+CORS(
+    app,
+    origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176",
+        "http://localhost:5177",
+        "http://localhost:5178",
+        "http://localhost:5179",
+        "http://localhost:5180",
+        "http://localhost:5181",
+        "http://localhost:5182",
+        "http://localhost:5183",
+        "http://localhost:8081",
+        "http://localhost:8082",
+        "https://medimind.vercel.app"
+    ],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+    supports_credentials=True
+)
 
 # Register blueprints
 app.register_blueprint(predict_bp, url_prefix='/api/predict')

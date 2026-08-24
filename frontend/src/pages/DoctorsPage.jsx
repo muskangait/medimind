@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Stethoscope, Star, MapPin, Clock, Phone, Calendar, Search, Filter } from 'lucide-react'
 import { doctorAPI, appointmentAPI } from '../services/api'
+import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 
 const DoctorsPage = () => {
@@ -38,16 +39,27 @@ const DoctorsPage = () => {
   }, [search, specialization, doctors])
 
   const fetchDoctors = async () => {
-    try {
-      const response = await doctorAPI.getAll()
-      setDoctors(response.data.data || [])
-      setFiltered(response.data.data || [])
-    } catch (error) {
-      toast.error('Failed to load doctors')
-    } finally {
-      setLoading(false)
+  try {
+    const { data, error } = await supabase
+      .from('doctors')
+      .select('*')
+
+    if (error) {
+      console.error('SUPABASE DOCTOR ERROR:', error)
+      throw error
     }
+
+    console.log('SUPABASE DOCTORS:', data)
+
+    setDoctors(data || [])
+    setFiltered(data || [])
+  } catch (error) {
+    console.error('FAILED TO LOAD DOCTORS:', error)
+    toast.error('Failed to load doctors')
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleBookAppointment = async () => {
     if (!appointmentData.appointmentDate || !appointmentData.appointmentTime) {

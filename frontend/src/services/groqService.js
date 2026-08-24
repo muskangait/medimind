@@ -9,7 +9,7 @@ const groqChat = async (messages, maxTokens = 2048) => {
       'Authorization': `Bearer ${GROQ_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-20b',
       messages,
       temperature: 0.7,
       max_tokens: maxTokens,
@@ -25,9 +25,9 @@ const groqChat = async (messages, maxTokens = 2048) => {
   return data.choices[0].message.content
 }
 
-// ============================================================
+
 // SYMPTOM ANALYZER
-// ============================================================
+
 export const analyzeSymptoms = async ({ symptoms, age, gender, lifestyle }) => {
   const prompt = `You are an expert medical AI assistant. Analyze the following patient information and provide a detailed medical assessment.
 

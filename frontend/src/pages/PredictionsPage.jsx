@@ -89,7 +89,7 @@ const PredictionsPage = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Disease Risk Prediction</h1>
-        <p className="text-gray-500 text-sm mt-1">ML-powered risk analysis using Logistic Regression + Random Forest</p>
+       
       </div>
 
       {/* Disease Selector */}

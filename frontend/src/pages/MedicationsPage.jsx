@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Pill, Plus, Clock, Calendar, CheckCircle, XCircle, X } from 'lucide-react'
-import { medicationAPI } from '../services/api'
+import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 
 const frequencies = [
@@ -28,48 +28,133 @@ const MedicationsPage = () => {
   }, [])
 
   const fetchMedications = async () => {
-    try {
-      const response = await medicationAPI.getAll()
-      setMedications(response.data.data || [])
-    } catch (error) {
-      toast.error('Failed to load medications')
-    } finally {
-      setLoading(false)
-    }
-  }
+  try {
+    setLoading(true)
 
-  const handleAdd = async () => {
-    if (!form.name || !form.dosage || !form.startDate) {
-      toast.error('Please fill required fields')
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser()
+
+    if (userError) throw userError
+
+    if (!user) {
+      toast.error('Please login first')
+      setMedications([])
       return
     }
-    setSubmitting(true)
-    try {
-      await medicationAPI.add(form)
-      toast.success('Medication added!')
-      setShowForm(false)
-      setForm({
-        name: '', dosage: '', frequency: 'Once daily',
-        startDate: '', endDate: '', instructions: '', prescribedBy: ''
-      })
-      fetchMedications()
-    } catch (error) {
-      toast.error('Failed to add medication')
-    } finally {
-      setSubmitting(false)
-    }
+
+    const { data, error } = await supabase
+      .from('medications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    const formattedMedications = (data || []).map(med => ({
+      id: med.id,
+      name: med.name,
+      dosage: med.dosage,
+      frequency: med.frequency,
+      startDate: med.start_date,
+      endDate: med.end_date,
+      instructions: med.instructions,
+      prescribedBy: med.prescribed_by,
+      active: med.is_active
+    }))
+
+    setMedications(formattedMedications)
+
+  } catch (error) {
+    console.error('FETCH MEDICATIONS ERROR:', error)
+    toast.error(error.message || 'Failed to load medications')
+  } finally {
+    setLoading(false)
   }
+}
+
+  const handleAdd = async () => {
+  if (!form.name || !form.dosage || !form.startDate) {
+    toast.error('Please fill required fields')
+    return
+  }
+
+  setSubmitting(true)
+
+  try {
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser()
+
+    if (userError) throw userError
+
+    if (!user) {
+      toast.error('Please login first')
+      return
+    }
+
+    const { error } = await supabase
+      .from('medications')
+      .insert({
+        user_id: user.id,
+        name: form.name,
+        dosage: form.dosage,
+        frequency: form.frequency,
+        start_date: form.startDate,
+        end_date: form.endDate || null,
+        instructions: form.instructions || null,
+        prescribed_by: form.prescribedBy || null,
+        is_active: true
+      })
+
+    if (error) throw error
+
+    toast.success('Medication added!')
+
+    setShowForm(false)
+
+    setForm({
+      name: '',
+      dosage: '',
+      frequency: 'Once daily',
+      startDate: '',
+      endDate: '',
+      instructions: '',
+      prescribedBy: ''
+    })
+
+    await fetchMedications()
+
+  } catch (error) {
+    console.error('ADD MEDICATION ERROR:', error)
+    toast.error(error.message || 'Failed to add medication')
+  } finally {
+    setSubmitting(false)
+  }
+}
 
   const handleDeactivate = async (id) => {
-    try {
-      await medicationAPI.deactivate(id)
-      toast.success('Medication stopped')
-      fetchMedications()
-    } catch (error) {
-      toast.error('Failed to update medication')
-    }
-  }
+  try {
+    const { error } = await supabase
+      .from('medications')
+      .update({
+        is_active: false
+      })
+      .eq('id', id)
 
+    if (error) throw error
+
+    toast.success('Medication stopped')
+
+    await fetchMedications()
+
+  } catch (error) {
+    console.error('DEACTIVATE MEDICATION ERROR:', error)
+    toast.error(error.message || 'Failed to update medication')
+  }
+}
   const activeMeds = medications.filter(m => m.active)
   const inactiveMeds = medications.filter(m => !m.active)
 
